@@ -1,4 +1,4 @@
-# formation-evaluation
+# FormationPy
 
 Python utility for formation evaluation and petrophysical analysis support
 
