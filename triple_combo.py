@@ -1,10 +1,11 @@
-def triple_combo(df, column_depth, column_GR, column_resistivity, 
-                 column_NPHI, column_RHOB, min_depth, max_depth, 
+def triple_combo(df, column_depth, column_GR, column_resistivity,
+                 column_NPHI, column_RHOB, min_depth, max_depth,
                  min_GR=0, max_GR=150, sand_GR_line=60,
-                 min_resistivity=0.01, max_resistivity=1000, 
-                 color_GR='black', color_resistivity='green', 
+                 min_resistivity=0.01, max_resistivity=1000,
+                 min_NPHI=-0.15, max_NPHI=0.45, min_RHOB=1.95, max_RHOB=2.95,
+                 color_GR='black', color_resistivity='green',
                  color_RHOB='red', color_NPHI='blue',
-                 figsize=(6,10), tight_layout=1, 
+                 figsize=(6,10), tight_layout=1,
                  title_size=15, title_height=1.05):
   """
   Producing Triple Combo log
@@ -18,15 +19,15 @@ def triple_combo(df, column_depth, column_GR, column_resistivity,
   specify your depth limits; min_depth and max_depth
 
   input variables other than above are default. You can specify
-  the values yourselves. 
+  the values yourselves.
 
   Output:
 
   Fill colors; gold (sand), lime green (non-sand), blue (water-zone), orange (HC-zone)
   """
-  
+
   import matplotlib.pyplot as plt
-  from matplotlib.ticker import AutoMinorLocator  
+  from matplotlib.ticker import AutoMinorLocator
   import numpy as np
 
   fig, ax=plt.subplots(1,3,figsize=(8,10))
@@ -42,11 +43,11 @@ def triple_combo(df, column_depth, column_GR, column_resistivity,
 
   ax[2].minorticks_on()
   ax[2].grid(which='major', linestyle='-', linewidth='0.5', color='lime')
-  ax[2].grid(which='minor', linestyle=':', linewidth='1', color='black')  
+  ax[2].grid(which='minor', linestyle=':', linewidth='1', color='black')
 
   # First track: GR
   ax[0].get_xaxis().set_visible(False)
-  ax[0].invert_yaxis()   
+  ax[0].invert_yaxis()
 
   gr=ax[0].twiny()
   gr.set_xlim(min_GR,max_GR)
@@ -54,18 +55,18 @@ def triple_combo(df, column_depth, column_GR, column_resistivity,
   gr.set_ylim(max_depth, min_depth)
   gr.spines['top'].set_position(('outward',10))
   gr.tick_params(axis='x',colors=color_GR)
-  gr.plot(df[column_GR], df[column_depth], color=color_GR)  
+  gr.plot(df[column_GR], df[column_depth], color=color_GR)
 
   gr.minorticks_on()
   gr.xaxis.grid(which='major', linestyle='-', linewidth='0.5', color='lime')
-  gr.xaxis.grid(which='minor', linestyle=':', linewidth='1', color='black') 
+  gr.xaxis.grid(which='minor', linestyle=':', linewidth='1', color='black')
 
   gr.fill_betweenx(df[column_depth], sand_GR_line, df[column_GR], where=(sand_GR_line>=df[column_GR]), color = 'gold', linewidth=0) # sand
   gr.fill_betweenx(df[column_depth], sand_GR_line, df[column_GR], where=(sand_GR_line<df[column_GR]), color = 'lime', linewidth=0) # shale
 
   # Second track: Resistivity
   ax[1].get_xaxis().set_visible(False)
-  ax[1].invert_yaxis()   
+  ax[1].invert_yaxis()
 
   res=ax[1].twiny()
   res.set_xlim(min_resistivity,max_resistivity)
@@ -73,19 +74,19 @@ def triple_combo(df, column_depth, column_GR, column_resistivity,
   res.set_ylim(max_depth, min_depth)
   res.spines['top'].set_position(('outward',10))
   res.tick_params(axis='x',colors=color_resistivity)
-  res.semilogx(df[column_resistivity], df[column_depth], color=color_resistivity)    
+  res.semilogx(df[column_resistivity], df[column_depth], color=color_resistivity)
 
   res.minorticks_on()
   res.xaxis.grid(which='major', linestyle='-', linewidth='0.5', color='lime')
-  res.xaxis.grid(which='minor', linestyle=':', linewidth='1', color='black')   
+  res.xaxis.grid(which='minor', linestyle=':', linewidth='1', color='black')
 
   # Third track: NPHI and RHOB
   ax[2].get_xaxis().set_visible(False)
-  ax[2].invert_yaxis()  
+  ax[2].invert_yaxis()
 
-  ## NPHI curve 
+  ## NPHI curve
   nphi=ax[2].twiny()
-  nphi.set_xlim(-0.15,0.45)
+  nphi.set_xlim(min_NPHI, max_NPHI)
   nphi.invert_xaxis()
   nphi.set_xlabel('NPHI',color='blue')
   nphi.set_ylim(max_depth, min_depth)
@@ -95,11 +96,11 @@ def triple_combo(df, column_depth, column_GR, column_resistivity,
 
   nphi.minorticks_on()
   nphi.xaxis.grid(which='major', linestyle='-', linewidth='0.5', color='lime')
-  nphi.xaxis.grid(which='minor', linestyle=':', linewidth='1', color='black')     
+  nphi.xaxis.grid(which='minor', linestyle=':', linewidth='1', color='black')
 
-  ## RHOB curve 
+  ## RHOB curve
   rhob=ax[2].twiny()
-  rhob.set_xlim(1.95,2.95)
+  rhob.set_xlim(min_RHOB, max_RHOB)
   rhob.set_xlabel('RHOB',color='red')
   rhob.set_ylim(max_depth, min_depth)
   rhob.spines['top'].set_position(('outward',50))
@@ -117,5 +118,5 @@ def triple_combo(df, column_depth, column_GR, column_resistivity,
   res.grid(which='major', linestyle='-', linewidth='0.5', color='lime')
   res.grid(which='minor', linestyle=':', linewidth='1', color='black')
 
-  plt.tight_layout()  
-  plt.show() 
+  plt.tight_layout()
+  plt.show()
