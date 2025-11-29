@@ -39,3 +39,46 @@ def calculate_PHIT(df, nphi_column, phid_column='PHID_Calc', A=0, B=0):
   phit = phid + (A * (nphi - phid)) + B
   df['PHIT_Calc'] = phit
   return df
+
+def calculate_SW(df, rt_column, phit_column='PHIT_Calc', a=1, m=2, n=2, Rw=0.022):
+  """
+  Derive water saturation (SW)
+
+  Arguments:
+    df: dataframe
+    rt_column: column name of RT (true resistivity)
+    phit_column: column name of PHIT. default is 'PHIT_Calc'
+    a: Archie factor, default 1
+    m: cement exponent, default 2
+    n: saturation exponent, default 2
+    Rw: water resistivity, already extrapolated at depth
+  
+  Output:
+    vsh: shale volume curve
+  """    
+  rt, phit = df[rt_column], df[phit_column]
+  sw = (a * Rw / (phit**m * rt))**(1 / n)
+  df['SW_Calc'] = sw
+
+  # QC 
+  # Set 'SW_Calc' values greater than 1 or less than 0 to NaN
+  df.loc[df['SW_Calc'] > 1, 'SW_Calc'] = np.nan
+  df.loc[df['SW_Calc'] < 0, 'SW_Calc'] = np.nan   
+  return df
+
+def calculate_VSH(df, gr_column):
+  """
+  Derive shale volume (VSH) curve
+
+  Arguments:
+    df: dataframe
+    gr_column: column name of GR
+  
+  Output:
+    vsh: shale volume curve
+  """    
+  gr = df[gr_column]
+  gr_min, gr_max = gr.min(), gr.max()
+  vsh = (gr - gr_min) / (gr_max - gr_min)
+  df['VSH_Calc'] = vsh 
+  return df
